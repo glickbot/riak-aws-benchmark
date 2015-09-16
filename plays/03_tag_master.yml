@@ -1,0 +1,10 @@
+- hosts: bench
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: Tag Main BB Node
+    ec2_tag: resource={{ ec2_id }} region={{ region }} state=present
+    when: inventory_hostname == groups['bench'][0]
+    args:
+      tags:
+        Name: Master

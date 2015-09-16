@@ -1,0 +1,12 @@
+- hosts: riak
+  gather_facts: true
+
+- hosts: bench
+  gather_facts: true
+
+- hosts: master
+  tasks:
+  - template: src=files/bb.config.j2 dest=/home/ubuntu/basho_bench/bb.config
+  - command: ./basho_bench -n {{ set_name }} -N bb@127.0.0.1 bb.config chdir=/home/ubuntu/basho_bench
+    async: 14400
+    poll: 30

@@ -1,0 +1,23 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - ec2_vpc:
+      state: present
+      cidr_block: 172.22.0.0/16
+      resource_tags: { "Name":"{{ set_name }}", "Environment":"{{ aws_env }}" }
+      region: "{{ region }}"
+      subnets:
+      - cidr: 172.22.1.0/24
+        resource_tags: { "Environment":"{{ aws_env }}", "Tier" : "Riak" }
+      internet_gateway: True
+      route_tables:
+        - subnets:
+            - 172.22.1.0/24
+          routes:
+            - dest: 0.0.0.0/0
+              gw: igw
+    register: vpc
+  - template: src=files/hosts.j2 dest=../inventory/hosts
+  # - file: ../runs/{{ set_name }}/ state=directory
+  # - template: src=files/hosts.j2 dest=../runs/{{ set_name }}/hosts

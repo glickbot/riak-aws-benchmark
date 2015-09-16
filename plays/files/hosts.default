@@ -1,0 +1,50 @@
+[local]
+localhost
+
+[riak:children]
+tag_Type_Riak
+
+[bench:children]
+tag_Type_Bench
+
+[master:children]
+tag_Name_Master
+
+[local:vars]
+ansible_connection=local
+gather_facts=no
+
+[all:vars]
+ansible_ssh_user=ubuntu
+
+## bb Settings
+bb_duration=1
+bb_concurrent=5
+
+## Environment Settings ##
+set_name=unnamed
+region=us-east-1
+aws_env=Test
+influxdb_db=telegraf
+
+## Riak Instance Info ##
+riak_size=m3.medium
+riak_ami=ami-45e18d20
+riak_count=3
+# Volumes
+vol_size=30
+vol_type=standard
+vol_iops=none
+vol_device=xvdc
+vol_mount=/var/lib/riak
+is_10g=false
+
+## Benchmark Instance Info ##
+bench_size=m3.medium
+bench_ami=ami-4b630d2e
+bench_count=3
+
+[ec2]
+[tag_Type_Riak]
+[tag_Type_Bench]
+[tag_Name_Master]

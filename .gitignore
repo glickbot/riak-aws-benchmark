@@ -1,0 +1,6 @@
+inventory/
+results/
+init.sh
+*.swp
+key
+key.pub

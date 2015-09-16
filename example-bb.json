@@ -1,0 +1,17 @@
+{
+"set_name" : "example_run",
+"bb_duration" : 30,
+"bb_concurrent" : 120,
+"region" : "us-east-1",
+"aws_env" : "Test",
+"riak_size" : "m3.medium",
+"riak_ami" : "ami-45e18d20",
+"riak_count" : 5,
+"vol_size" : 120,
+"vol_type" : "standard",
+"vol_iops" : "none",
+"is_10g" : false,
+"bench_size" : "m3.medium",
+"bench_ami" : "ami-4b630d2e",
+"bench_count" : 7
+}

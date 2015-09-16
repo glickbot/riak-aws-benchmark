@@ -1,0 +1,13 @@
+- hosts: master
+  tasks:
+  - command: make results chdir=/home/ubuntu/basho_bench
+  - synchronize: src=/home/ubuntu/basho_bench/tests/{{ set_name }} dest=../results/ mode=pull
+
+- hosts: master
+  sudo: true
+  tasks:
+  - pause: seconds=5 prompt="waiting to capture cluster metrics after b_b run"
+  - service: name=influxdb state=stopped
+  - synchronize: src=/var/opt/influxdb dest=../results/{{ set_name }} mode=pull
+  - service: name=influxdb state=started
+  - local_action: copy src=../inventory/hosts dest=../results/{{ set_name }}/inventory

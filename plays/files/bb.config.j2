@@ -1,0 +1,30 @@
+{mode, max}.
+% {mode, {rate, 2}}.
+
+{duration, {{ bb_duration }} }.
+
+{report_interval, 1}.
+
+{concurrent, {{ bb_concurrent }} }.
+
+{driver, basho_bench_driver_riakc_pb}.
+
+{key_generator, {int_to_bin_bigendian, {pareto_int, 130000}}}.
+
+{value_generator, {uniform_bin, 7000, 14000}}.
+
+{riakc_pb_ips, [{% for server in groups["riak"] %}{ {{ hostvars[server]['ansible_eth0'].ipv4.address|replace(".",",") }} }{% if not loop.last %},{% endif %}{% endfor %}]}.
+
+{riakc_pb_port, 8087}.
+
+{riakc_pb_bucket, <<"b">>}.
+
+% {riakc_pb_replies, 1}.
+
+{operations, [{get, 50}, {update, 15}]}.
+
+{pb_connect_options, [{auto_reconnect, true}]}.
+
+{remote_nodes, [{% for server in groups["bench"] %}{ '{{ hostvars[server]['ansible_fqdn'] }}', 'bb' }{% if not loop.last %},{% endif %}{% endfor %}]}.
+{distribute_work, true}.
+%{value_generator_blob_file, "/home/rsokol/value"}.

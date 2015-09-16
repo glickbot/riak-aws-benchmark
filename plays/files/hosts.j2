@@ -1,0 +1,54 @@
+[local]
+localhost
+
+[riak:children]
+tag_Type_Riak
+
+[bench:children]
+tag_Type_Bench
+
+[master:children]
+tag_Name_Master
+
+[local:vars]
+ansible_connection=local
+gather_facts=no
+
+[all:vars]
+ansible_ssh_user=ubuntu
+
+## bb Settings
+bb_duration={{ bb_duration }}
+bb_concurrent={{ bb_concurrent }}
+
+## Environment Settings ##
+set_name={{ set_name }}
+region={{ region }}
+aws_env={{ aws_env }}
+influxdb_db={{ influxdb_db }}
+
+## Riak Instance Info ##
+riak_size={{ riak_size }}
+riak_ami={{ riak_ami }}
+riak_count={{ riak_count }}
+# Volumes
+vol_size={{ vol_size }}
+vol_type={{ vol_type }}
+vol_iops={{ vol_iops }}
+vol_device={{ vol_device }}
+vol_mount={{ vol_mount }}
+is_10g={{ is_10g }}
+
+## Benchmark Instance Info ##
+bench_size={{ bench_size }}
+bench_ami={{ bench_ami }}
+bench_count={{ bench_count }}
+
+## Don't Change These ##
+subnetid={{ vpc["subnets"][0]["id"] }}
+vpcid={{ vpc["vpc"]["id"] }}
+
+[ec2]
+[tag_Type_Riak]
+[tag_Type_Bench]
+[tag_Name_Master]

@@ -1,0 +1,66 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - command: ssh-keygen -t rsa -b 2048 -f ../key -N "" creates=../key
+
+  - name: ec2 key
+    local_action:
+      module: ec2_key
+      name: "{{ set_name }}"
+      key_material: "{{ item }}"
+      region: "{{ region }}"
+    with_file: ../key.pub
+
+  - name: ec2 group
+    local_action:
+      module: ec2_group
+      name: "{{ set_name }}"
+      description: "{{ set_name }}"
+      region: "{{ region }}"
+      vpc_id: "{{ vpcid }}"
+      rules:
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: all
+          group_name: "{{ set_name }}"
+
+  - name: Initialize Riak Nodes
+    local_action:
+      module: ec2
+      key_name: "{{ set_name }}"
+      instance_type: "{{ riak_size }}"
+      instance_tags:
+        Type: Riak
+      count_tag:
+        Type: Riak
+      image: "{{ riak_ami }}"
+      wait: yes
+      group: "{{ set_name }}"
+      region: "{{ region }}"
+      wait_timeout: 500
+      exact_count: "{{ riak_count }}"
+      vpc_subnet_id: "{{ subnetid }}"
+      assign_public_ip: yes
+      monitoring: yes
+
+  - name: Initialize Bench Nodes
+    local_action:
+      module: ec2
+      key_name: "{{ set_name }}"
+      instance_type: "{{ bench_size }}"
+      instance_tags:
+        Type: Bench
+      count_tag:
+        Type: Bench
+      image: "{{ bench_ami }}"
+      wait: yes
+      group: "{{ set_name }}"
+      region: "{{ region }}"
+      wait_timeout: 500
+      exact_count: "{{ bench_count }}"
+      vpc_subnet_id: "{{ subnetid }}"
+      assign_public_ip: yes
+      monitoring: yes

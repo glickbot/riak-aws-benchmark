@@ -1,0 +1,7 @@
+- hosts: local
+  connection: local
+  gather_facts: false
+  tasks:
+  - file: dest=../inventory/hosts state=absent
+  - copy: src=files/hosts.default dest=../inventory/hosts
+  - template: src=files/ec2.ini.j2 dest=../inventory/ec2.ini

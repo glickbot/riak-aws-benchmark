@@ -1,0 +1,29 @@
+- hosts: bench
+  sudo: true
+  tasks:
+  - apt: name={{ item }} state=installed
+    with_items:
+    - git
+    - build-essential
+    - erlang
+
+- hosts: bench
+  tasks:
+  - git: repo=https://github.com/basho/basho_bench dest=/home/ubuntu/basho_bench
+  - command: make chdir=/home/ubuntu/basho_bench
+
+- hosts: master
+  sudo: true
+  tasks:
+  - apt: name={{ item }} state=installed
+    with_items:
+    - r-base
+    - r-cran-getopt
+    - r-cran-proto
+    - r-cran-ggplot2
+  - command: chdir=/home/ubuntu/basho_bench Rscript --vanilla priv/common.r
+
+- hosts: master
+  tasks:
+  - copy: src=../key dest=/home/ubuntu/.ssh/id_rsa mode=0600
+  - copy: src=files/ssh_config dest=/home/ubuntu/.ssh/config mode=0644
