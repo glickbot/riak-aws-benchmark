@@ -59,4 +59,4 @@ run plays/05_setup.yml
 
 #### Bench
 run plays/06_bench.yml
-# cleanup
+cleanup
