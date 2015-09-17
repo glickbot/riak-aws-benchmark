@@ -4,7 +4,7 @@
   - local_action: file dest={{ base_dir }}/results state=directory
   - local_action: file dest={{ base_dir }}/results/{{ set_name }} state=directory
   - local_action: file dest={{ base_dir }}/results/{{ set_name }}/debugs state=directory
-  - synchronize: src=/home/ubuntu/basho_bench/tests/{{ set_name }} dest={{ base_dir }}/results//{{ set_name }}/basho_bench mode=pull
+  - synchronize: src=/home/ubuntu/basho_bench/tests/{{ set_name }}/ dest={{ base_dir }}/results//{{ set_name }}/basho_bench mode=pull
 
 - hosts: master
   sudo: true
