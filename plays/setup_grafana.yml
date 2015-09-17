@@ -1,0 +1,11 @@
+- hosts: master
+  sudo: true
+  any_errors_fatal: True
+  vars:
+    grafana_pkg: grafana_2.1.3_amd64.deb
+  tasks:
+  - command: wget https://grafanarel.s3.amazonaws.com/builds/{{ grafana_pkg }} creates={{ grafana_pkg }}
+  - apt: name=adduser state=installed
+  - apt: name=libfontconfig state=installed
+  - command: dpkg -i {{ grafana_pkg }}
+  - service: name=grafana-server state=started

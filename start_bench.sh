@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export base_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 if [ -z "$1" ]
   then
     echo "usage: $0 <vars.json>"
@@ -9,10 +11,25 @@ if [ -z "$1" ]
     exit
 fi
 
+config_json=$1
+
+if [ -f init.sh ]; then
+   source init.sh
+fi
+
+run () {
+  echo "## RUNNING $@ ##"
+  ansible-playbook $@ --extra-vars "@$config_json"
+  if [ $? -gt 0 ]; then
+    echo "##########################################"
+    echo "# Playbook $0 failed, initiating cleanup #"
+    echo "##########################################"
+    cleanup
+  fi
+}
+
 cleanup () {
-  ansible-playbook plays/w01_rm_instances.yml
-  ansible-playbook plays/w02_rm_vpc.yml
-  rm -r -f inventory
+  ansible-playbook plays/99_wipe.yml
   exit
 }
 
@@ -20,36 +37,26 @@ if [ ! -d inventory ]; then
   mkdir inventory
   echo "[local]" >> inventory/hosts
   echo "localhost" >> inventory/hosts
-  ansible-playbook plays/00_init_set.yml --extra-vars "@$1"
+  run plays/00_init_set.yml
   cp plays/files/ec2.py inventory/
-  ansible-playbook plays/01_mk_vpc.yml --extra-vars "@$1"
+  run plays/01_mk_vpc.yml
 else
   echo "Inventory Directory found, not creating new VPC"
   echo "Please run wipe.sh to clean up hosts+vpc"
   echo "and remove inventory dir to start a new benchmark"
 fi
 
-if [ $? -eq 1 ]; then cleanup; fi
-ansible-playbook plays/02_start_instances.yml
-if [ $? -eq 1 ]; then cleanup; fi
+#### Provision
+run plays/02_start_instances.yml
 ./inventory/ec2.py --refresh-cache > /dev/null
-ansible-playbook plays/03_tag_master.yml
-if [ $? -eq 1 ]; then cleanup; fi
-ansible-playbook plays/04_add_volumes.yml
-if [ $? -eq 1 ]; then cleanup; fi
-./inventory/ec2.py --refresh-cache > /dev/null
-ansible-playbook plays/05.pre_upgrade_kernel.yml
-if [ $? -eq 1 ]; then cleanup; fi
-# ansible-playbook plays/05.pre_tune.yml
-# if [ $? -eq 1 ]; then cleanup; fi
-ansible-playbook plays/05_setup_riak.yml
-if [ $? -eq 1 ]; then cleanup; fi
-ansible-playbook plays/06_setup_metrics.yml
-if [ $? -eq 1 ]; then cleanup; fi
-ansible-playbook plays/07_setup_bb.yml
-if [ $? -eq 1 ]; then cleanup; fi
-ansible-playbook plays/08_start_bb.yml
-ansible-playbook plays/09_gather_results.yml
-if [ $? -eq 1 ]; then cleanup; fi
 
+run plays/03_tag_master.yml
+run plays/04_add_volumes.yml
+./inventory/ec2.py --refresh-cache > /dev/null
+
+#### Setup
+run plays/05_setup.yml
+
+#### Bench
+run plays/06_bench.yml
 # cleanup

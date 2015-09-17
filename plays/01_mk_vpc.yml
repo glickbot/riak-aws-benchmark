@@ -1,6 +1,9 @@
 - hosts: localhost
   connection: local
   gather_facts: false
+  any_errors_fatal: True
+  vars:
+    base_dir: "{{ lookup('env','base_dir') }}"
   tasks:
   - ec2_vpc:
       state: present
@@ -18,6 +21,4 @@
             - dest: 0.0.0.0/0
               gw: igw
     register: vpc
-  - template: src=files/hosts.j2 dest=../inventory/hosts
-  # - file: ../runs/{{ set_name }}/ state=directory
-  # - template: src=files/hosts.j2 dest=../runs/{{ set_name }}/hosts
+  - template: src=files/hosts.j2 dest={{ base_dir }}/inventory/hosts

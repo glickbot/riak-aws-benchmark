@@ -1,0 +1,6 @@
+- include: upgrade_kernel.yml
+- include: tune.yml
+- include: setup_riak.yml
+- include: setup_metrics.yml
+#- include: setup_grafana.yml
+- include: setup_bb.yml

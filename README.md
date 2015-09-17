@@ -21,8 +21,9 @@ The idea is to be able to specify size/type of Riak cluster, and size/type of be
 
 * run ```./start_bench.sh```
 
-###### NOTE: 
+###### NOTE:
 * by default, start_bench.sh will also wipe the cluster once it's done
+* doesn't install grafana by default. json dashboard for convenience
 
 ###### TODO:
 

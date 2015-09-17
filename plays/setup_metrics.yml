@@ -1,22 +1,20 @@
 - hosts: master
   sudo: true
+  any_errors_fatal: True
   vars:
     influxdb_pkg: influxdb_0.9.4.1_amd64.deb
-    telegraf_pkg: telegraf_0.1.8_amd64.deb
   tasks:
   - command: wget https://s3.amazonaws.com/influxdb/{{ influxdb_pkg }} creates={{ influxdb_pkg }}
   - command: dpkg -i {{ influxdb_pkg }}
   - service: name=influxdb state=started
   - command: /opt/influxdb/influx -execute 'create database {{ influxdb_db }}'
     ignore_errors: yes
-  # - command: wget https://grafanarel.s3.amazonaws.com/builds/grafana_2.1.3_amd64.deb creates=grafana_2.1.3_amd64.deb
-  # - apt: name=adduser state=installed
-  # - apt: name=libfontconfig state=installed
-  # - command: dpkg -i grafana_2.1.3_amd64.deb
-  # - service: name=grafana-server state=started
 
 - hosts: riak
   sudo: true
+  any_errors_fatal: True
+  vars:
+    telegraf_pkg: telegraf_0.1.8_amd64.deb
   tasks:
   - command: wget http://get.influxdb.org/telegraf/{{ telegraf_pkg }} creates={{ telegraf_pkg }}
   - command: dpkg -i {{ telegraf_pkg }}
@@ -25,6 +23,9 @@
 
 - hosts: bench
   sudo: true
+  any_errors_fatal: True
+  vars:
+    telegraf_pkg: telegraf_0.1.8_amd64.deb
   tasks:
   - command: wget http://get.influxdb.org/telegraf/{{ telegraf_pkg }} creates={{ telegraf_pkg }}
   - command: dpkg -i {{ telegraf_pkg }}

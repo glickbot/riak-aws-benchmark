@@ -1,7 +1,9 @@
 - hosts: local
   connection: local
   gather_facts: false
+  vars:
+    base_dir: "{{ lookup('env','base_dir') }}"
   tasks:
-  - file: dest=../inventory/hosts state=absent
-  - copy: src=files/hosts.default dest=../inventory/hosts
-  - template: src=files/ec2.ini.j2 dest=../inventory/ec2.ini
+  - file: dest={{ base_dir }}/inventory/hosts state=absent
+  - copy: src=files/hosts.default dest={{ base_dir }}/inventory/hosts
+  - template: src=files/ec2.ini.j2 dest={{ base_dir }}/inventory/ec2.ini

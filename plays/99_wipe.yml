@@ -1,3 +1,9 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - pause: seconds=10 prompt="About to wipe Volumes, Nodes, and VPC for {{ set_name }}, ctrl+c to break"
+
 - hosts: riak
   connection: local
   gather_facts: false
@@ -48,3 +54,28 @@
       region: "{{ region }}"
       wait_timeout: 500
       exact_count: 0
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: ec2 group
+    local_action:
+      module: ec2_group
+      name: "{{ set_name }}"
+      description: "{{ set_name }}"
+      region: "{{ region }}"
+      vpc_id: "{{ vpcid }}"
+      state: absent
+  - ec2_vpc:
+      resource_tags: { "Name":"{{ set_name }}", "Environment":"{{ aws_env }}" }
+      state: absent
+      vpc_id: "{{ vpcid }}"
+      region: "{{ region }}"
+      wait: yes
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - file: path={{ base_dir }}/inventory state=absent

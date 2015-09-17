@@ -1,0 +1,34 @@
+- hosts: riak
+  sudo: true
+  any_errors_fatal: True
+  vars:
+    base: http://kernel.ubuntu.com/~kernel-ppa/mainline/v3.18.20-vivid
+    packages:
+      - linux-headers-3.18.20-031820_3.18.20-031820.201508081633_all.deb
+      - linux-headers-3.18.20-031820-generic_3.18.20-031820.201508081633_amd64.deb
+      - linux-image-3.18.20-031820-generic_3.18.20-031820.201508081633_amd64.deb
+
+  tasks:
+  - command: wget {{ base }}/{{ item }} creates={{ item }}
+    with_items: packages
+  - shell: dpkg -i -E --dry-run {{ item }} 2>&1 | grep "already installed, skippingblarg"
+    with_items: packages
+    ignore_errors: true
+    register: package_status
+  - command: dpkg -i {{ item.item }}
+    with_items: package_status.results
+    when: item | failed
+    notify:
+      - update-grub
+  handlers:
+  - name: update-grub
+    command: update-grub
+    notify:
+      - restart
+  - name: restart
+    command: reboot
+    notify:
+      - wait for ssh
+  - name: wait for ssh
+    local_action: wait_for port=22 host="{{ ansible_ssh_host | default(inventory_hostname) }}" search_regex=OpenSSH delay=10
+    sudo: no

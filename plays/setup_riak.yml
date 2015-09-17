@@ -1,11 +1,12 @@
 - hosts: riak
   sudo: true
+  any_errors_fatal: True
   tasks:
   - command: apt-get -y update
   - copy: src=files/riak-limits.conf dest=/etc/security/limits.d/riak-limits.conf
   - command: wget http://s3.amazonaws.com/downloads.basho.com/riak/2.1/2.1.1/ubuntu/precise/riak_2.1.1-1_amd64.deb creates=riak_2.1.1-1_amd64.deb
   - command: dpkg -i riak_2.1.1-1_amd64.deb
-  - template: files/src=riak.conf.j2 dest=/etc/riak/riak.conf
+  - template: src=files/riak.conf.j2 dest=/etc/riak/riak.conf
   - service: name=riak state=started
   - command: riak-admin wait-for-service riak_kv
   - command: riak-admin cluster join riak@{{ hostvars[groups['riak'][0]]['ec2_private_dns_name'] }}

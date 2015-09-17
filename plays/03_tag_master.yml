@@ -1,6 +1,7 @@
 - hosts: bench
   connection: local
   gather_facts: false
+  any_errors_fatal: True
   tasks:
   - name: Tag Main BB Node
     ec2_tag: resource={{ ec2_id }} region={{ region }} state=present

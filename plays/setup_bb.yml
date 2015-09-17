@@ -1,5 +1,6 @@
 - hosts: bench
   sudo: true
+  any_errors_fatal: True
   tasks:
   - apt: name={{ item }} state=installed
     with_items:
@@ -8,12 +9,14 @@
     - erlang
 
 - hosts: bench
+  any_errors_fatal: True
   tasks:
   - git: repo=https://github.com/basho/basho_bench dest=/home/ubuntu/basho_bench
   - command: make chdir=/home/ubuntu/basho_bench
 
 - hosts: master
   sudo: true
+  any_errors_fatal: True
   tasks:
   - apt: name={{ item }} state=installed
     with_items:
@@ -24,6 +27,7 @@
   - command: chdir=/home/ubuntu/basho_bench Rscript --vanilla priv/common.r
 
 - hosts: master
+  any_errors_fatal: True
   tasks:
   - copy: src=../key dest=/home/ubuntu/.ssh/id_rsa mode=0600
   - copy: src=files/ssh_config dest=/home/ubuntu/.ssh/config mode=0644

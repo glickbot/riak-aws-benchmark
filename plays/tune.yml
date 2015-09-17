@@ -1,0 +1,35 @@
+- hosts: riak
+  sudo: true
+  any_errors_fatal: True
+  tasks:
+  - shell: echo 1024 > /sys/block/{{ vol_device }}/queue/nr_requests
+  - shell: echo deadline > /sys/block/{{ vol_device }}/queue/scheduler
+  - command: mount -o remount,barrier=0 {{ vol_mount }}
+  - stat: path=/sys/kernel/mm/transparent_hugepage
+    register: thp
+  - shell: echo "never" > /sys/kernel/mm/transparent_hugepage/defrag
+    when: thp.stat.isdir is defined and thp.stat.isdir
+  - shell: echo "never" > /sys/kernel/mm/transparent_hugepage/enabled
+    when: thp.stat.isdir is defined and thp.stat.isdir
+
+  - sysctl: name={{ item.k }} value="{{ item.v }}" state=present
+    with_items:
+      - { k: 'net.ipv4.tcp_max_syn_backlog', v: '40000' }
+      - { k: 'net.core.somaxconn', v: '40000' }
+      - { k: 'net.core.wmem_default', v: '8388608' }
+      - { k: 'net.core.rmem_default', v: '8388608' }
+      - { k: 'net.ipv4.tcp_sack', v: '1' }
+      - { k: 'net.ipv4.tcp_window_scaling', v: '1' }
+      - { k: 'net.ipv4.tcp_fin_timeout', v: '15' }
+      - { k: 'net.ipv4.tcp_keepalive_intvl', v: '30' }
+      - { k: 'net.ipv4.tcp_tw_reuse', v: '1' }
+      - { k: 'net.ipv4.tcp_moderate_rcvbuf', v: '1' }
+  - sysctl: name={{ item.k }} value="{{ item.v }}" state=present
+    with_items:
+      - { k: 'net.core.rmem_max', v: '134217728' }
+      - { k: 'net.core.wmem_max', v: '134217728' }
+      - { k: 'net.ipv4.tcp_mem ', v: '134217728 134217728 134217728' }
+      - { k: 'net.ipv4.tcp_rmem', v: '4096 277750 134217728' }
+      - { k: 'net.ipv4.tcp_wmem', v: '4096 277750 134217728' }
+      - { k: 'net.core.netdev_max_backlog', v: '300000' }
+    when: is_10g == true

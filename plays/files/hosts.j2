@@ -47,6 +47,8 @@ bench_count={{ bench_count }}
 ## Don't Change These ##
 subnetid={{ vpc["subnets"][0]["id"] }}
 vpcid={{ vpc["vpc"]["id"] }}
+base_dir={{ base_dir }}
+ansible_ssh_private_key_file={{ base_dir }}/key
 
 [ec2]
 [tag_Type_Riak]

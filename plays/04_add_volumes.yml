@@ -1,5 +1,6 @@
 - hosts: riak
   connection: local
+  any_errors_fatal: True
   tasks:
   - ec2_vol:
       region: "{{ region }}"

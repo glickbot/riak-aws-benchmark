@@ -1,6 +1,7 @@
 - hosts: localhost
   connection: local
   gather_facts: false
+  any_errors_fatal: True
   tasks:
   - command: ssh-keygen -t rsa -b 2048 -f ../key -N "" creates=../key
 

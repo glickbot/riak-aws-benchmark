@@ -1,0 +1,33 @@
+- hosts: master
+  tasks:
+  - command: make results chdir=/home/ubuntu/basho_bench
+  - local_action: file dest={{ base_dir }}/results state=directory
+  - local_action: file dest={{ base_dir }}/results/{{ set_name }} state=directory
+  - local_action: file dest={{ base_dir }}/results/{{ set_name }}/debugs state=directory
+  - synchronize: src=/home/ubuntu/basho_bench/tests/{{ set_name }} dest={{ base_dir }}/results//{{ set_name }}/basho_bench mode=pull
+
+- hosts: master
+  sudo: true
+  tasks:
+  - pause: seconds=5 prompt="waiting to capture cluster metrics after b_b run"
+  - service: name=influxdb state=stopped
+  - command: chgrp -R {{ ansible_ssh_user }} /var/opt/influxdb
+  - command: find /var/opt/influxdb -type d -exec chmod g+rx {} \;
+  - command: find /var/opt/influxdb -type f -exec chmod g+r {} \;
+  - synchronize: src=/var/opt/influxdb dest={{ base_dir }}/results/{{ set_name }} mode=pull
+    sudo: no
+  - service: name=influxdb state=started
+  - local_action: copy src=../inventory/hosts dest={{ base_dir }}/results/{{ set_name }}/inventory
+    sudo: no
+
+- hosts: riak
+  sudo: true
+  vars:
+    runner_base_dir: /usr/lib/riak
+    runner_base_dir: /usr/lib/riak
+    runner_script_dir: /usr/sbin
+    runner_etc_dir: /etc/riak
+  tasks:
+  - template: src=files/riak-debug.j2 dest=/usr/sbin/riak-debug owner=root mode=755
+  - command: riak-debug -c -l -p -r -y -s -v -e {{ ec2_private_dns_name }}.tar.gz
+  - synchronize: src=/tmp/{{ ec2_private_dns_name }}.tar.gz dest={{ base_dir }}/results/{{ set_name }}/debugs mode=pull
