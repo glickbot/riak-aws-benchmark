@@ -27,4 +27,4 @@
 
 {remote_nodes, [{% for server in groups["bench"] %}{ '{{ hostvars[server]['ansible_fqdn'] }}', 'bb' }{% if not loop.last %},{% endif %}{% endfor %}]}.
 {distribute_work, true}.
-%{value_generator_blob_file, "/home/rsokol/value"}.
+{value_generator_blob_file, "/tmp/valgen"}.

@@ -11,7 +11,7 @@
   tasks:
   - command: wget {{ base }}/{{ item }} creates={{ item }}
     with_items: packages
-  - shell: dpkg -i -E --dry-run {{ item }} 2>&1 | grep "already installed, skippingblarg"
+  - shell: dpkg -i -E --dry-run {{ item }} 2>&1 | grep "already installed, skipping"
     with_items: packages
     ignore_errors: true
     register: package_status

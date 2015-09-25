@@ -23,4 +23,6 @@
   tasks:
   - command: parted -s /dev/{{ vol_device }} mklabel msdos mkpart primary ext4 1MiB 100% creates=/dev/{{ vol_device }}1
   - filesystem: fstype=ext4 device=/dev/{{ vol_device }}1
+    async: 3600
+    poll: 10
   - mount: name={{ vol_mount }} src=/dev/{{ vol_device }}1 fstype=ext4 opts=noatime,data=writeback,barrier=0 state=mounted

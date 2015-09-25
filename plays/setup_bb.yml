@@ -2,6 +2,8 @@
   sudo: true
   any_errors_fatal: True
   tasks:
+  - command: apt-get -y update
+  - copy: src=files/riak-limits.conf dest=/etc/security/limits.d/riak-limits.conf
   - apt: name={{ item }} state=installed
     with_items:
     - git

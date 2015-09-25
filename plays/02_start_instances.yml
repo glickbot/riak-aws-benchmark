@@ -35,8 +35,10 @@
       instance_type: "{{ riak_size }}"
       instance_tags:
         Type: Riak
+        Set: "{{ set_name }}"
       count_tag:
         Type: Riak
+        Set: "{{ set_name }}"
       image: "{{ riak_ami }}"
       wait: yes
       group: "{{ set_name }}"
@@ -45,7 +47,7 @@
       exact_count: "{{ riak_count }}"
       vpc_subnet_id: "{{ subnetid }}"
       assign_public_ip: yes
-      monitoring: yes
+      monitoring: no
 
   - name: Initialize Bench Nodes
     local_action:
@@ -54,8 +56,10 @@
       instance_type: "{{ bench_size }}"
       instance_tags:
         Type: Bench
+        Set: "{{ set_name }}"
       count_tag:
         Type: Bench
+        Set: "{{ set_name }}"
       image: "{{ bench_ami }}"
       wait: yes
       group: "{{ set_name }}"
@@ -64,4 +68,4 @@
       exact_count: "{{ bench_count }}"
       vpc_subnet_id: "{{ subnetid }}"
       assign_public_ip: yes
-      monitoring: yes
+      monitoring: no
